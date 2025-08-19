@@ -8,7 +8,7 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top shadow-sm">
       <div className="container-fluid">
         <Link className="navbar-brand fw-bold text-primary" to="/">
-          Al's Power Washing
+          Al's Pressure Washing
         </Link>
         
         <button

@@ -7,7 +7,7 @@ const About = () => {
         {/* Hero Section */}
         <div className="row justify-content-center mb-5">
           <div className="col-lg-8 text-center">
-            <h1 className="display-4 fw-bold mb-4">About Al's Power Washing</h1>
+            <h1 className="display-4 fw-bold mb-4">About Al's Pressure Washing</h1>
             <p className="lead text-muted">
               Founded in late 2024, we're passionate about transforming properties 
               through professional power washing services in Milwaukee, Wisconsin.

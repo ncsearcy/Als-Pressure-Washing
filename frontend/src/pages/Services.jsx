@@ -52,7 +52,7 @@ const Services = () => {
           <div className="col-lg-8 text-center">
             <h1 className="display-4 fw-bold mb-4">Our Services</h1>
             <p className="lead text-muted">
-              Professional power washing services designed to transform your property. 
+              Professional pressure washing services designed to transform your property. 
               We specialize in outdoor surfaces that need expert care.
             </p>
           </div>
@@ -163,7 +163,7 @@ const Services = () => {
                     </div>
                     <h4 className="h5 fw-bold mb-2">Cleaning</h4>
                     <p className="text-muted small">
-                      Professional power washing using proper techniques and pressure
+                      Professional pressure washing using proper techniques and pressure
                     </p>
                   </div>
                 </div>

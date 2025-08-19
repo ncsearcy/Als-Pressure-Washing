@@ -63,7 +63,7 @@ const Gallery = () => {
           <div>
             <h1 className="display-4 fw-bold mb-2">Photo Gallery</h1>
             <p className="lead text-muted">
-              See our power washing transformations in action
+              See our pressure washing transformations in action
             </p>
           </div>
           <button 

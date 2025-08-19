@@ -11,10 +11,10 @@ const Home = () => {
             <div className="col-lg-6">
               <div className="hero-content">
                 <h1 className="display-4 fw-bold mb-4">
-                  Professional Power Washing Services
+                  Professional Pressure Washing Services
                 </h1>
                 <p className="lead mb-4">
-                  Transform your property with Al's Power Washing. We specialize in 
+                  Transform your property with Al's Pressure Washing. We specialize in 
                   driveways, sidewalks, and patios in Milwaukee, Wisconsin.
                 </p>
                 <div className="hero-buttons">
@@ -31,7 +31,7 @@ const Home = () => {
               <div className="hero-image">
                 <img 
                   src="/images/APW-Logo.PNG" 
-                  alt="Power washing in action" 
+                  alt="Pressure washing in action" 
                   className="img-fluid rounded shadow-lg"
                   style={{ width: '100%', height: '400px', objectFit: 'scale-down' }}
                 />
@@ -112,7 +112,7 @@ const Home = () => {
             <div className="col-lg-6">
               <h2 className="display-5 fw-bold mb-4">See the Difference</h2>
               <p className="lead mb-4">
-                Our professional power washing services deliver remarkable results. 
+                Our professional pressure washing services deliver remarkable results. 
                 Check out our gallery to see real before and after photos from 
                 recent projects in Milwaukee.
               </p>
@@ -149,7 +149,7 @@ const Home = () => {
         <div className="container">
           <div className="row">
             <div className="col-12 text-center mb-5">
-              <h2 className="display-5 fw-bold mb-3">Why Choose Al's Power Washing?</h2>
+              <h2 className="display-5 fw-bold mb-3">Why Choose Al's Pressure Washing?</h2>
             </div>
           </div>
           <div className="row g-4">

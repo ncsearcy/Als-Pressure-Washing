@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container">
         <div className="row">
           <div className="col-md-8">
-            <h5 className="text-primary mb-3">Al's Power Washing</h5>
+            <h5 className="text-primary mb-3">Al's Pressure Washing</h5>
             <p className="mb-2">Professional pressure washing services in Milwaukee, WI</p>
             <p className="text-muted small mb-0">
               Making Milwaukee homes and businesses shine since 2024
@@ -59,7 +59,7 @@ const Footer = () => {
           </div>
           <div className="col-md-4 text-md-end">
             <p className="text-muted small mb-0">
-              © {new Date().getFullYear()} Al's Power Washing. All rights reserved.
+              © {new Date().getFullYear()} Al's Pressure Washing. All rights reserved.
             </p>
           </div>
         </div>

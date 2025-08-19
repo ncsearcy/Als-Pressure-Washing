@@ -153,7 +153,7 @@ const Contact = () => {
           <div className="col-md-8 col-lg-6">
             <div className="card shadow border-0">
               <div className="card-header bg-primary text-white text-center py-4">
-                <h1 className="h3 mb-2">Contact Al's Power Washing</h1>
+                <h1 className="h3 mb-2">Contact Al's Pressure Washing</h1>
                 <p className="mb-0">Get your free quote today!</p>
               </div>
 
