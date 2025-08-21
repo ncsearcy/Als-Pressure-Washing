@@ -12,7 +12,7 @@ const Gallery = () => {
     setError(null);
     
     try {
-      const response = await axios.get('/gallery');
+      const response = await axios.get('/api/gallery');
       
       if (response.data.success) {
         setImages(response.data.images);
@@ -63,7 +63,7 @@ const Gallery = () => {
           <div>
             <h1 className="display-4 fw-bold mb-2">Photo Gallery</h1>
             <p className="lead text-muted">
-              See our pressure washing transformations in action
+              See our power washing transformations in action
             </p>
           </div>
           <button 
@@ -132,12 +132,12 @@ const Gallery = () => {
         {/* Gallery Grid */}
         {!loading && !error && images.length > 0 && (
           <>
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <p className="text-muted">
                 <i className="fas fa-images me-2"></i>
                 {images.length} image{images.length !== 1 ? 's' : ''} found
               </p>
-            </div>
+            </div> */}
             
             <div className="row g-4">
               {images.map((image, index) => (
@@ -197,7 +197,7 @@ const Gallery = () => {
 
         {/* Floating Refresh Button */}
         <button
-          className="btn btn-primary btn-lg rounded-circle position-fixed shadow-lg"
+          className="btn btn-primary btn-lg rounded-circle position-fixed shadow-lg d-flex align-items-center justify-content-center"
           style={{
             bottom: '30px',
             right: '30px',
