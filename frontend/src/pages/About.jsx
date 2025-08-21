@@ -56,7 +56,7 @@ const About = () => {
           <div className="col-lg-4">
             <div className="team-member-image text-center">
               <img 
-                src="/api/placeholder/300/300" 
+                src="/images/Allen.jpg" 
                 alt="Allen - Owner" 
                 className="img-fluid rounded-circle shadow"
                 style={{width: '250px', height: '250px', objectFit: 'cover'}}
