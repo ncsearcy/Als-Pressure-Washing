@@ -10,18 +10,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// For Vercel deployment, adjust the static path
-const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
-const galleryPath = isVercel 
-  ? path.join(process.cwd(), 'backend/public/gallery')
-  : path.join(__dirname, 'public/gallery');
-
 // Serve static files from gallery folder
-app.use('/api/images', express.static(galleryPath));
+app.use('/api/images', express.static(path.join(__dirname, 'public/gallery')));
 
 // Gallery API endpoint
 app.get('/api/gallery', async (req, res) => {
   try {
+    const galleryPath = path.join(__dirname, 'public/gallery');
+    
     // Create gallery directory if it doesn't exist
     try {
       await fs.access(galleryPath);
@@ -124,16 +120,11 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// For Vercel, we need to handle the serverless function export
-if (isVercel) {
-  module.exports = app;
-} else {
-  // Start server for local development
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Gallery API available at http://localhost:${PORT}/api/gallery`);
-    console.log(`Health check at http://localhost:${PORT}/api/health`);
-  });
-}
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Gallery API available at http://localhost:${PORT}/api/gallery`);
+  console.log(`Health check at http://localhost:${PORT}/api/health`);
+});
 
 module.exports = app;

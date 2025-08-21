@@ -7,60 +7,21 @@ const Gallery = () => {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // Environment-aware API base URL
-  const getApiBaseUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-      // Production - use your Vercel backend URL
-      return 'https://als-pressure-washing.vercel.app';
-    }
-    // Development - check if backend is running on different port
-    return process.env.REACT_APP_API_URL || 'http://localhost:5000';
-  };
-
-  // Environment-aware image base URL
-  const getImageBaseUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-      // In production, images are served directly from Vercel's static hosting
-      return 'https://als-pressure-washing.vercel.app';
-    }
-    // Development
-    return process.env.REACT_APP_API_URL || 'http://localhost:5000';
-  };
-
   const loadGallery = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const apiBaseUrl = getApiBaseUrl();
-      const response = await axios.get(`${apiBaseUrl}/api/gallery`);
+      const response = await axios.get('/gallery');
       
       if (response.data.success) {
-        // Update image URLs to use the correct base URL
-        const imagesWithCorrectUrls = response.data.images.map(image => ({
-          ...image,
-          url: process.env.NODE_ENV === 'production' 
-            ? image.url // In production, the API returns the correct path (/gallery/filename)
-            : image.url // In development, keep the API response as is
-        }));
-        
-        setImages(imagesWithCorrectUrls);
+        setImages(response.data.images);
       } else {
         setError(response.data.error || 'Failed to load images');
       }
     } catch (err) {
       console.error('Gallery loading error:', err);
-      
-      // More specific error handling
-      if (err.code === 'NETWORK_ERROR' || err.code === 'ERR_NETWORK') {
-        setError('Unable to connect to the server. Please check if the backend is running.');
-      } else if (err.response?.status === 404) {
-        setError('Gallery API endpoint not found. Please check your backend deployment.');
-      } else if (err.response?.status === 500) {
-        setError('Server error occurred while loading images.');
-      } else {
-        setError(err.response?.data?.error || err.message || 'Failed to connect to server');
-      }
+      setError(err.response?.data?.error || 'Failed to connect to server');
     } finally {
       setLoading(false);
     }
@@ -92,12 +53,6 @@ const Gallery = () => {
       month: 'short',
       day: 'numeric'
     });
-  };
-
-  // Helper function to get full image URL
-  const getFullImageUrl = (imageUrl) => {
-    const imageBaseUrl = getImageBaseUrl();
-    return `${imageBaseUrl}${imageUrl}`;
   };
 
   return (
@@ -136,7 +91,7 @@ const Gallery = () => {
             <div className="spinner-border text-primary" role="status" style={{width: '3rem', height: '3rem'}}>
               <span className="visually-hidden">Loading images...</span>
             </div>
-            <p className="mt-3 text-muted">Loading images from gallery...</p>
+            <p className="mt-3 text-muted">Loading images from gallery folder...</p>
           </div>
         )}
 
@@ -147,10 +102,7 @@ const Gallery = () => {
               <h4 className="alert-heading">Unable to load gallery</h4>
               <p className="mb-3">{error}</p>
               <p className="mb-0">
-                {process.env.NODE_ENV === 'development' 
-                  ? 'Make sure the backend server is running on port 5000 and the gallery folder exists.'
-                  : 'Please check that the backend is properly deployed and accessible.'
-                }
+                Make sure the backend server is running and the gallery folder exists.
               </p>
               <hr />
               <button className="btn btn-primary" onClick={loadGallery}>
@@ -168,10 +120,7 @@ const Gallery = () => {
             </div>
             <h4 className="text-muted mb-3">No images found</h4>
             <p className="text-muted">
-              {process.env.NODE_ENV === 'development'
-                ? 'Add some images to the "public/gallery" folder on the server and refresh the page.'
-                : 'No images have been uploaded to the gallery yet.'
-              }
+              Add some images to the "public/gallery" folder on the server and refresh the page.
             </p>
             <button className="btn btn-outline-primary" onClick={loadGallery}>
               <i className="fas fa-sync-alt me-2"></i>
@@ -183,6 +132,13 @@ const Gallery = () => {
         {/* Gallery Grid */}
         {!loading && !error && images.length > 0 && (
           <>
+            <div className="mb-4">
+              <p className="text-muted">
+                <i className="fas fa-images me-2"></i>
+                {images.length} image{images.length !== 1 ? 's' : ''} found
+              </p>
+            </div>
+            
             <div className="row g-4">
               {images.map((image, index) => (
                 <div key={image.filename} className="col-sm-6 col-md-4 col-lg-3">
@@ -190,7 +146,7 @@ const Gallery = () => {
                     <div className="card h-100 shadow-sm border-0 gallery-card">
                       <div className="card-img-container position-relative overflow-hidden">
                         <img
-                          src={getFullImageUrl(image.url)}
+                          src={`http://localhost:5000${image.url}`}
                           alt={image.title}
                           className="card-img-top gallery-image"
                           style={{
@@ -203,10 +159,6 @@ const Gallery = () => {
                           onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
                           onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                           loading="lazy"
-                          onError={(e) => {
-                            console.error('Failed to load image:', image.filename);
-                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5Ij5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
-                          }}
                         />
                         <div className="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
                              style={{
@@ -245,7 +197,7 @@ const Gallery = () => {
 
         {/* Floating Refresh Button */}
         <button
-          className="btn btn-primary btn-lg rounded-circle position-fixed shadow-lg d-flex align-items-center justify-content-center"
+          className="btn btn-primary btn-lg rounded-circle position-fixed shadow-lg"
           style={{
             bottom: '30px',
             right: '30px',
@@ -277,14 +229,10 @@ const Gallery = () => {
               </div>
               <div className="modal-body p-0">
                 <img
-                  src={getFullImageUrl(selectedImage.url)}
+                  src={`http://localhost:5000${selectedImage.url}`}
                   alt={selectedImage.title}
                   className="img-fluid w-100"
                   style={{maxHeight: '70vh', objectFit: 'contain'}}
-                  onError={(e) => {
-                    console.error('Failed to load modal image:', selectedImage.filename);
-                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5Ij5JbWFnZSBub3QgZm91bmQ8L3RleHQ+PC9zdmc+';
-                  }}
                 />
               </div>
               <div className="modal-footer justify-content-between">

@@ -1,0 +1,25 @@
+{
+  "images": [
+    {
+      "filename": "before-after-1.jpg",
+      "title": "Driveway Transformation",
+      "description": "Before and after driveway cleaning"
+    },
+    {
+      "filename": "deck-cleaning.jpg", 
+      "title": "Deck Restoration",
+      "description": "Complete deck cleaning and restoration"
+    },
+    {
+      "filename": "house-siding.jpg",
+      "title": "House Siding Wash",
+      "description": "Professional house siding cleaning"
+    },
+    {
+      "filename": "concrete-cleaning.jpg",
+      "title": "Concrete Surface Cleaning", 
+      "description": "Heavy-duty concrete pressure washing"
+    }
+  ],
+  "lastUpdated": "2025-08-20T00:00:00.000Z"
+}
