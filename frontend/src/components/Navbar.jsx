@@ -7,10 +7,16 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top shadow-sm">
       <div className="container-fluid">
-        <Link className="navbar-brand fw-bold text-primary" to="/">
-          Al's Pressure Washing
+        <Link className="navbar-brand" to="/">
+          <img 
+            src="images\APW-Logo.PNG" 
+            alt="Al's Pressure Washing" 
+            height="40"
+            className="d-inline-block align-text-top"
+          />
         </Link>
         
+
         <button
           className="navbar-toggler"
           type="button"
