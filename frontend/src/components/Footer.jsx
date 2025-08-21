@@ -55,6 +55,16 @@ const Footer = () => {
               >
                 Fin
               </a>
+              <br />
+              Site Remodel and Optimization by {' '}
+              <a
+              href='https://www.nicholassearcy.com/'
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-light" 
+              >
+                Nicholas Searcy
+              </a>
             </p>
           </div>
           <div className="col-md-4 text-md-end">
