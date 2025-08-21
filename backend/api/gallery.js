@@ -13,9 +13,11 @@ export default async function handler(req, res) {
 
   try {
     // In Vercel, use the public directory for static files
-    const galleryPath = path.join(process.cwd(), 'backend/public/gallery');
+    const galleryPath = path.join(process.cwd(), 'public', 'gallery');
 
     console.log('Looking for gallery at:', galleryPath);
+    console.log('Current working directory:', process.cwd());
+    console.log('Environment:', process.env.VERCEL ? 'Vercel' : 'Local');
 
     // Check if gallery directory exists (don't try to create it)
     let files = [];
