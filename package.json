@@ -1,5 +1,5 @@
 {
-  "name": "my-website-monorepo",
+  "name": "APW-monorepo",
   "version": "1.0.0",
   "private": true,
   "description": "Pressure Washing website monorepo with React frontend and Node.js backend",
