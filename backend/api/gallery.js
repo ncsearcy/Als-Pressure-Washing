@@ -13,49 +13,66 @@ export default async function handler(req, res) {
 
   try {
     // In Vercel, use the public directory for static files
-    const galleryPath = path.join(process.cwd(), 'public/gallery');
+    const galleryPath = path.join(process.cwd(), 'public', 'gallery');
 
-    // Create gallery directory if it doesn't exist
+    console.log('Looking for gallery at:', galleryPath);
+
+    // Check if gallery directory exists (don't try to create it)
+    let files = [];
     try {
-      await fs.access(galleryPath);
+      files = await fs.readdir(galleryPath);
+      console.log('Found files:', files);
     } catch (error) {
-      await fs.mkdir(galleryPath, { recursive: true });
-      console.log('Created gallery directory');
+      console.log('Gallery directory not found or empty:', error.message);
+      // Return empty gallery instead of error
+      return res.status(200).json({
+        success: true,
+        images: [],
+        count: 0,
+        message: 'Gallery directory not found. Please upload images to /public/gallery/'
+      });
     }
-
-    // Read directory contents
-    const files = await fs.readdir(galleryPath);
     
     // Filter for image files
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp'];
-    const images = files.filter(file => {
+    const imageFiles = files.filter(file => {
       const ext = path.extname(file).toLowerCase();
       return imageExtensions.includes(ext);
     });
 
+    console.log('Image files found:', imageFiles);
+
     // Return image data with metadata
     const imageData = await Promise.all(
-      images.map(async (filename) => {
-        const filePath = path.join(galleryPath, filename);
-        const stats = await fs.stat(filePath);
-        
-        return {
-          filename,
-          url: `/gallery/${filename}`, // Vercel serves from /public automatically
-          size: stats.size,
-          lastModified: stats.mtime,
-          title: path.parse(filename).name.replace(/[-_]/g, ' ')
-        };
+      imageFiles.map(async (filename) => {
+        try {
+          const filePath = path.join(galleryPath, filename);
+          const stats = await fs.stat(filePath);
+          
+          return {
+            filename,
+            url: `/gallery/${filename}`, // Vercel serves from /public automatically
+            size: stats.size,
+            lastModified: stats.mtime,
+            title: path.parse(filename).name.replace(/[-_]/g, ' ')
+          };
+        } catch (error) {
+          console.error(`Error processing file ${filename}:`, error);
+          return null;
+        }
       })
     );
 
+    // Filter out null entries (failed files)
+    const validImages = imageData.filter(img => img !== null);
+
     // Sort by last modified date (newest first)
-    imageData.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
+    validImages.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
 
     res.status(200).json({
       success: true,
-      images: imageData,
-      count: imageData.length
+      images: validImages,
+      count: validImages.length
     });
 
   } catch (error) {
@@ -63,7 +80,11 @@ export default async function handler(req, res) {
     res.status(500).json({
       success: false,
       error: 'Failed to load gallery images',
-      message: error.message
+      message: error.message,
+      debug: {
+        cwd: process.cwd(),
+        nodeEnv: process.env.NODE_ENV
+      }
     });
   }
 }
