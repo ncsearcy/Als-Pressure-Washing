@@ -8,7 +8,6 @@ const Services = () => {
       title: 'Driveways',
       description: 'Professional driveway cleaning to remove oil stains, dirt, and grime. We work with concrete, asphalt, and brick driveways to restore them to like-new condition.',
       features: [
-        'Oil stain removal',
         'Concrete restoration',
         'Asphalt cleaning',
         'Brick driveway care',
