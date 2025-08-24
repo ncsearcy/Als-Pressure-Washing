@@ -7,12 +7,19 @@ const Gallery = () => {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
+  // Configure API base URL based on environment
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 
+    (process.env.NODE_ENV === 'production' 
+      ? 'https://als-pressure-washing-backend.onrender.com/'  // Replace with your actual Render URL
+      : 'http://localhost:5000'
+    );
+
   const loadGallery = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await axios.get('/api/gallery');
+      const response = await axios.get(`${API_BASE_URL}/api/gallery`);
       
       if (response.data.success) {
         setImages(response.data.images);
@@ -21,7 +28,11 @@ const Gallery = () => {
       }
     } catch (err) {
       console.error('Gallery loading error:', err);
-      setError(err.response?.data?.error || 'Failed to connect to server');
+      if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
+        setError('Cannot connect to server. Please make sure the backend is running.');
+      } else {
+        setError(err.response?.data?.error || 'Failed to connect to server');
+      }
     } finally {
       setLoading(false);
     }
@@ -38,6 +49,25 @@ const Gallery = () => {
   const closeModal = () => {
     setSelectedImage(null);
   };
+
+  // Handle keyboard events for modal
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === 'Escape' && selectedImage) {
+        closeModal();
+      }
+    };
+
+    if (selectedImage) {
+      document.addEventListener('keydown', handleKeyPress);
+      document.body.style.overflow = 'hidden'; // Prevent background scroll
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedImage]);
 
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
@@ -65,6 +95,12 @@ const Gallery = () => {
             <p className="lead text-muted">
               See our power washing transformations in action
             </p>
+            {images.length > 0 && (
+              <small className="text-muted">
+                <i className="fas fa-images me-2"></i>
+                {images.length} image{images.length !== 1 ? 's' : ''} found
+              </small>
+            )}
           </div>
           <button 
             className="btn btn-outline-primary"
@@ -91,7 +127,7 @@ const Gallery = () => {
             <div className="spinner-border text-primary" role="status" style={{width: '3rem', height: '3rem'}}>
               <span className="visually-hidden">Loading images...</span>
             </div>
-            <p className="mt-3 text-muted">Loading images from gallery folder...</p>
+            <p className="mt-3 text-muted">Loading images from gallery...</p>
           </div>
         )}
 
@@ -99,13 +135,21 @@ const Gallery = () => {
         {error && !loading && (
           <div className="error-container text-center py-5">
             <div className="alert alert-danger" role="alert">
-              <h4 className="alert-heading">Unable to load gallery</h4>
+              <h4 className="alert-heading">
+                <i className="fas fa-exclamation-triangle me-2"></i>
+                Unable to load gallery
+              </h4>
               <p className="mb-3">{error}</p>
               <p className="mb-0">
-                Make sure the backend server is running and the gallery folder exists.
+                {error.includes('connect') ? (
+                  'Please check that the backend server is running and accessible.'
+                ) : (
+                  'Make sure the server is running and the gallery folder exists.'
+                )}
               </p>
               <hr />
               <button className="btn btn-primary" onClick={loadGallery}>
+                <i className="fas fa-redo me-2"></i>
                 Try Again
               </button>
             </div>
@@ -120,7 +164,7 @@ const Gallery = () => {
             </div>
             <h4 className="text-muted mb-3">No images found</h4>
             <p className="text-muted">
-              Add some images to the "public/gallery" folder on the server and refresh the page.
+              The gallery is currently empty. Images will appear here once they're added to the server.
             </p>
             <button className="btn btn-outline-primary" onClick={loadGallery}>
               <i className="fas fa-sync-alt me-2"></i>
@@ -131,91 +175,107 @@ const Gallery = () => {
 
         {/* Gallery Grid */}
         {!loading && !error && images.length > 0 && (
-          <>
-            {/* <div className="mb-4">
-              <p className="text-muted">
-                <i className="fas fa-images me-2"></i>
-                {images.length} image{images.length !== 1 ? 's' : ''} found
-              </p>
-            </div> */}
-            
-            <div className="row g-4">
-              {images.map((image, index) => (
-                <div key={image.filename} className="col-sm-6 col-md-4 col-lg-3">
-                  <div className="gallery-item">
-                    <div className="card h-100 shadow-sm border-0 gallery-card">
-                      <div className="card-img-container position-relative overflow-hidden">
-                        <img
-                          src={`http://localhost:5000${image.url}`}
-                          alt={image.title}
-                          className="card-img-top gallery-image"
-                          style={{
-                            height: '250px',
-                            objectFit: 'cover',
-                            cursor: 'pointer',
-                            transition: 'transform 0.3s ease'
-                          }}
-                          onClick={() => openModal(image)}
-                          onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-                          onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
-                          loading="lazy"
-                        />
-                        <div className="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
-                             style={{
-                               background: 'rgba(0,0,0,0.7)',
-                               opacity: 0,
-                               transition: 'opacity 0.3s ease',
-                               cursor: 'pointer'
-                             }}
-                             onClick={() => openModal(image)}
-                             onMouseOver={(e) => e.target.style.opacity = 1}
-                             onMouseOut={(e) => e.target.style.opacity = 0}
-                        >
-                          <i className="fas fa-search-plus text-white" style={{fontSize: '2rem'}}></i>
+          <div className="row g-4">
+            {images.map((image, index) => (
+              <div key={image.filename} className="col-sm-6 col-md-4 col-lg-3">
+                <div className="gallery-item">
+                  <div className="card h-100 shadow-sm border-0 gallery-card">
+                    <div className="card-img-container position-relative overflow-hidden">
+                      <img
+                        src={`${API_BASE_URL}${image.url}`}
+                        alt={image.title}
+                        className="card-img-top gallery-image"
+                        style={{
+                          height: '250px',
+                          objectFit: 'cover',
+                          cursor: 'pointer',
+                          transition: 'transform 0.3s ease'
+                        }}
+                        onClick={() => openModal(image)}
+                        onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                      {/* Fallback for broken images */}
+                      <div 
+                        className="d-none align-items-center justify-content-center bg-light text-muted"
+                        style={{ height: '250px' }}
+                      >
+                        <div className="text-center">
+                          <i className="fas fa-image-slash fa-2x mb-2"></i>
+                          <br />
+                          <small>Image not found</small>
                         </div>
                       </div>
-                      <div className="card-body">
-                        <h6 className="card-title text-capitalize mb-2">{image.title}</h6>
-                        <div className="card-text">
-                          <small className="text-muted d-block">
-                            <i className="fas fa-calendar-alt me-1"></i>
-                            {formatDate(image.lastModified)}
-                          </small>
-                          <small className="text-muted">
-                            <i className="fas fa-file-alt me-1"></i>
-                            {formatFileSize(image.size)}
-                          </small>
-                        </div>
+                      
+                      <div className="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
+                           style={{
+                             background: 'rgba(0,0,0,0.7)',
+                             opacity: 0,
+                             transition: 'opacity 0.3s ease',
+                             cursor: 'pointer'
+                           }}
+                           onClick={() => openModal(image)}
+                           onMouseOver={(e) => e.target.style.opacity = 1}
+                           onMouseOut={(e) => e.target.style.opacity = 0}
+                      >
+                        <i className="fas fa-search-plus text-white" style={{fontSize: '2rem'}}></i>
+                      </div>
+                    </div>
+                    <div className="card-body">
+                      <h6 className="card-title text-capitalize mb-2">{image.title}</h6>
+                      <div className="card-text">
+                        <small className="text-muted d-block">
+                          <i className="fas fa-calendar-alt me-1"></i>
+                          {formatDate(image.lastModified)}
+                        </small>
+                        <small className="text-muted">
+                          <i className="fas fa-file-alt me-1"></i>
+                          {formatFileSize(image.size)}
+                        </small>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </>
+              </div>
+            ))}
+          </div>
         )}
 
         {/* Floating Refresh Button */}
-        <button
-          className="btn btn-primary btn-lg rounded-circle position-fixed shadow-lg d-flex align-items-center justify-content-center"
-          style={{
-            bottom: '30px',
-            right: '30px',
-            width: '60px',
-            height: '60px',
-            zIndex: 1000
-          }}
-          onClick={loadGallery}
-          title="Refresh Gallery"
-          disabled={loading}
-        >
-          <i className={`fas fa-sync-alt ${loading ? 'fa-spin' : ''}`}></i>
-        </button>
+        {images.length > 0 && (
+          <button
+            className="btn btn-primary btn-lg rounded-circle position-fixed shadow-lg d-flex align-items-center justify-content-center"
+            style={{
+              bottom: '30px',
+              right: '30px',
+              width: '60px',
+              height: '60px',
+              zIndex: 1000
+            }}
+            onClick={loadGallery}
+            title="Refresh Gallery"
+            disabled={loading}
+          >
+            <i className={`fas fa-sync-alt ${loading ? 'fa-spin' : ''}`}></i>
+          </button>
+        )}
       </div>
 
       {/* Modal for full-size images */}
       {selectedImage && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{backgroundColor: 'rgba(0,0,0,0.8)'}}>
+        <div 
+          className="modal fade show d-block" 
+          tabIndex="-1" 
+          style={{backgroundColor: 'rgba(0,0,0,0.8)'}}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeModal();
+          }}
+        >
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content">
               <div className="modal-header">
@@ -229,7 +289,7 @@ const Gallery = () => {
               </div>
               <div className="modal-body p-0">
                 <img
-                  src={`http://localhost:5000${selectedImage.url}`}
+                  src={`${API_BASE_URL}${selectedImage.url}`}
                   alt={selectedImage.title}
                   className="img-fluid w-100"
                   style={{maxHeight: '70vh', objectFit: 'contain'}}
