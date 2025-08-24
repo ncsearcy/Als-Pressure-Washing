@@ -10,7 +10,7 @@ const Gallery = () => {
   // Configure API base URL based on environment
   const API_BASE_URL = process.env.REACT_APP_API_URL || 
     (process.env.NODE_ENV === 'production' 
-      ? 'https://als-pressure-washing-backend.onrender.com/'  // Replace with your actual Render URL
+      ? 'https://als-pressure-washing-backend.onrender.com'  // Replace with your actual Render URL
       : 'http://localhost:5000'
     );
 
